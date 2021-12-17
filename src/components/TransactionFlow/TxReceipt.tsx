@@ -125,7 +125,6 @@ const TxReceipt = ({
   );
 
   const displayTxReceipt = receipt ?? userTx!; // @todo: figure out why this was swapped
-  console.debug('displayTxReceipt', txReceipt);
   const timestamp = displayTxReceipt.timestamp ?? 0;
   const txStatus = displayTxReceipt.status ?? 0;
 
@@ -186,7 +185,6 @@ const TxReceipt = ({
       rate: getAssetRate(transfer.asset),
       amount: transfer.amount
     }));
-    console.debug('here: transfers ', displayTxReceipt.valueTransfers, valueTransferEvents);
     if (displayTxReceipt && !displayTxReceipt.value.isZero()) {
       valueTransferEvents.push({
         to: displayTxReceipt.to,
@@ -195,9 +193,10 @@ const TxReceipt = ({
         fromContact: getContactByAddressAndNetworkId(displayTxReceipt.from, network.id),
         amount: bigNumValueToViewableEther(displayTxReceipt.value),
         asset: displayTxReceipt.baseAsset,
-        rate: baseAssetRate
+        rate: baseAssetRate,
+        isNFTTransfer: false
       });
-    } else if (txConfig.amount != '0') {
+    } else if (!displayTxReceipt && txConfig.amount != '0') {
       valueTransferEvents.push({
         to: txConfig.receiverAddress || txConfig.rawTransaction.to!, // @todo: remove
         from: txConfig.senderAccount.address,
@@ -207,7 +206,8 @@ const TxReceipt = ({
         fromContact: getContactByAddressAndNetworkId(txConfig.senderAccount.address, network.id),
         amount: txConfig.amount,
         asset: txConfig.baseAsset,
-        rate: baseAssetRate
+        rate: baseAssetRate,
+        isNFTTransfer: false
       });
     }
     return valueTransferEvents;
@@ -260,7 +260,6 @@ const TxReceipt = ({
       />
     );
   }
-  console.debug('valueTransfers', valueTransfers);
   return (
     <TxReceiptUI
       settings={settings}
